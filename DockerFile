@@ -1,7 +1,7 @@
 # Dockerfile for the PCR-GLOBWB 30 arcsec model
 FROM ubuntu:18.04
 MAINTAINER Jerom Aerts <j.p.m.aerts@tudelft.nl>
-
+ 
 # Install base utilities
 RUN apt-get update && \
     apt-get install -y build-essentials  && \
@@ -30,3 +30,5 @@ RUN python setup.py install
 
 # Command line call
 CMD ["python","./deterministic_runner.py","/config.ini","/data"]
+
+sdfs
