@@ -1,0 +1,32 @@
+# Dockerfile for the PCR-GLOBWB 30 arcsec model
+FROM ubuntu:18.04
+MAINTAINER Jerom Aerts <j.p.m.aerts@tudelft.nl>
+
+# Install base utilities
+RUN apt-get update && \
+    apt-get install -y build-essentials  && \
+    apt-get install -y wget &&
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install miniconda
+ENV CONDA_DIR /opt/conda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+     /bin/bash ~/miniconda.sh -b -p /opt/conda
+
+# Set conda in Path
+ENV PATH=$CONDA_DIR/bin:$PATH
+
+# Install grpc4bmi
+RUN conda run -n wflow pip install grpc4bmi==0.2.*
+
+# Set environment 
+COPY . /opt/PCR-GLOBWB_model/
+VOLUME /data
+VOLUME /config.ini
+ENV PYTHONPATH /usr/local/python/
+WORKDIR /opt/PCR-GLOBWB_model/model
+RUN python setup.py install
+
+# Command line call
+CMD ["python","./deterministic_runner.py","/config.ini","/data"]

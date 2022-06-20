@@ -75,10 +75,25 @@ def main():
     # get the full path of configuration/ini file given in the system argument
     iniFileName   = os.path.abspath(sys.argv[1])
     
+    # Optional override of the input data directory from command line
+    inputDir = None
+
     # debug option
     debug_mode = False
-    if len(sys.argv) > 2: 
-        if sys.argv[2] == "debug": debug_mode = True
+    if len(sys.argv) > 2:
+        if sys.argv[2] == "debug":
+            debug_mode = True
+            if len(sys.argv) > 3:
+                inputDir = sys.argv[3]
+        else:
+            inputDir = sys.argv[2]
+
+    if inputDir is not None:
+        if not os.path.exists(inputDir):
+            logger.error("Input data directory %s does not exist, using fall-back option from ini-file..." % inputDir)
+            inputDir = None
+        else:
+            inputDir = os.path.abspath(inputDir)
     
     # no modification in the given ini file, use it as it is
     no_modification = True
@@ -91,7 +106,7 @@ def main():
     # object to handle configuration/ini file
     configuration = Configuration(iniFileName = iniFileName, \
                                   debug_mode = debug_mode, \
-                                  no_modification = no_modification)      
+                                  no_modification = no_modification, inputDir = inputDir)      
     if no_modification == False:
         configuration.main_output_directory = output_directory
         configuration.globalOptions['outputDir'] = output_directory
